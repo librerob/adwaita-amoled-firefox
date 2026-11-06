@@ -10,6 +10,7 @@ import zipfile
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "tools"))
 from contrast import over, ratio
+from check_amo import check_version
 from theme import ROLES, manifest, package, rendered
 
 
@@ -33,6 +34,13 @@ class ThemeTests(unittest.TestCase):
             "sidebar_highlight", "sidebar_highlight_text", "tab_loading",
             "tab_background_separator", "toolbar_field_separator", "popup_icons"
         })
+
+    def test_amo_version_registry_check(self):
+        known_versions = ["158.0", "159.0", "159.*", "160.0", "*"]
+        self.assertEqual(check_version(self.m, known_versions), "159.0")
+        self.m["browser_specific_settings"]["gecko"]["strict_min_version"] = "159.0.1"
+        with self.assertRaisesRegex(ValueError, "AMO does not recognize"):
+            check_version(self.m, known_versions)
 
     def test_text_and_compound_states(self):
         samples = []

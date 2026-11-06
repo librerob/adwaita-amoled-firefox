@@ -1,5 +1,10 @@
 # Validation
 
+Version 0.1.1 corrects the submission minimum from `159.0.1` to `159.0`.
+AMO's application-version registry includes `159.0` but not the patch release.
+The upload form checks that registry separately from the lint report. CI now
+runs `python tools/check_amo.py` to check this server-side constraint too.
+
 On 6 November 2026, [the validation run](https://github.com/librerob/adwaita-amoled-firefox/actions/runs/42244907800)
 passed all eight palette/package tests, manifest lint with warnings treated as
 errors, and native Firefox 159.0.1 checks on Windows and Linux. Each browser run

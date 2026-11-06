@@ -52,7 +52,7 @@ jobs:
       - name: Export captures for visual review
         if: runner.os == 'Linux'
         run: |
-          python -c "import base64,json; from pathlib import Path; names=['dark-horizontal-normal.png','dark-vertical-normal.png','menu.png','report.json']; print('PREVIEW_JSON='+json.dumps({name:base64.b64encode((Path('artifacts/firefox')/name).read_bytes()).decode() for name in names}))"
+          python -c "import base64,json; from pathlib import Path; names=['preview-horizontal.png','preview-vertical.png','report.json']; print('PREVIEW_JSON='+json.dumps({name:base64.b64encode((Path('artifacts/firefox')/name).read_bytes()).decode() for name in names}))"
           python -c "import base64,json; from pathlib import Path; print('PACKAGE_JSON='+json.dumps({p.name:base64.b64encode(p.read_bytes()).decode() for p in Path('dist').iterdir()}))"
       - uses: actions/upload-artifact@v4
         if: always()

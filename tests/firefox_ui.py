@@ -106,13 +106,13 @@ return {
 """
 
 
-def screenshot(client, target):
+def screenshot(client, target, height=None):
     data = client.js(WINDOW + """
       const canvas = doc.createElementNS('http://www.w3.org/1999/xhtml','canvas');
-      canvas.width=win.innerWidth; canvas.height=win.innerHeight;
-      canvas.getContext('2d').drawWindow(win,0,0,win.innerWidth,win.innerHeight,'rgb(0,0,0)');
+      canvas.width=win.innerWidth; canvas.height=Math.min(win.innerHeight,arguments[0] || win.innerHeight);
+      canvas.getContext('2d').drawWindow(win,0,0,canvas.width,canvas.height,'rgb(0,0,0)');
       return canvas.toDataURL('image/png').split(',')[1];
-    """)
+    """, height)
     target.write_bytes(base64.b64decode(data))
 
 
@@ -158,11 +158,11 @@ def main():
             client.js(WINDOW + """
               const principal=Services.scriptSecurityManager.getSystemPrincipal();
               const page = title => 'data:text/html,'+encodeURIComponent('<!doctype html><meta name="color-scheme" content="dark"><title>'+title+'</title><style>body{background:#000;color:#e6e6e6;font:18px system-ui;padding:70px}h1{font-size:32px;font-weight:500}p{color:#c0c0c0;line-height:1.7}a{color:#8ab4f8}</style><h1>'+title+'</h1><p>A quiet frame for the web.</p><p>Adwaita AMOLED for Firefox</p>');
-              win.gBrowser.selectedBrowser.loadURI(Services.io.newURI(page('Adwaita AMOLED')), {triggeringPrincipal:principal});
+              win.gBrowser.selectedBrowser.loadURI(Services.io.newURI('about:newtab'), {triggeringPrincipal:principal});
               for(const title of ['Reading list','Notes']) win.gBrowser.addTab(page(title),{triggeringPrincipal:principal});
               return true;
             """)
-            client.wait(WINDOW + "return win.gBrowser.tabs.length >= 3 && win.gBrowser.selectedTab.label === 'Adwaita AMOLED';")
+            client.wait(WINDOW + "return win.gBrowser.tabs.length >= 3 && win.gBrowser.selectedBrowser.currentURI.spec === 'about:newtab';")
             for system_mode in (1, 0):  # Firefox's ui.systemUsesDarkTheme override, confined to this profile.
                 client.js("Services.prefs.setIntPref('ui.systemUsesDarkTheme',arguments[0]); return true;", system_mode)
                 for vertical, compact in ((False, False), (True, False), (True, True)):
@@ -183,6 +183,8 @@ def main():
                     report["runtimePairs"].append({"state": sample["name"], "role": "selected tab label", "ratio": value})
                     report["samples"].append(sample)
                     screenshot(client, output / (sample["name"] + ".png"))
+                    if system_mode == 1 and not compact:
+                        screenshot(client, output / f"preview-{'vertical' if vertical else 'horizontal'}.png", 520 if vertical else 180)
             client.js(WINDOW + "win.gURLBar.focus(); win.gURLBar.inputField.select(); return true;")
             client.wait(WINDOW + "return doc.activeElement && (doc.activeElement.id === 'urlbar-input' || doc.activeElement.closest('#urlbar'));")
             screenshot(client, output / "address-focus.png")

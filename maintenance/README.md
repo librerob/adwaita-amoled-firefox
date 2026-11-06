@@ -17,7 +17,7 @@ layout. GTK and libadwaita updates belong to the separate desktop theme's watch.
 | Area | Why we watch it |
 | --- | --- |
 | Firefox theme schema and implementation | New, removed or changed color/property keys and fallback behavior |
-| LightweightThemeConsumer and browser colors | How theme values become native CSS variables and derived colors |
+| ThemeVariableMap, LightweightThemeConsumer/Manager and browser colors | How theme values become native CSS variables, derived colors and fallback themes |
 | Tabs, vertical sidebar, address results, menu and popup styles, design tokens | Changes to outlines, surfaces, opacity, selected/hovered text and Nova tokens |
 | MDN theme documentation and compatibility data | Documented changes and version requirements |
 | Mozilla Release, Beta and Nightly version metadata | New browser versions that need a compatibility review |

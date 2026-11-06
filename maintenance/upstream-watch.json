@@ -137,6 +137,21 @@
             "storybook": "4fde853e505dce96d85ac72cc4c08acd2c2ea0af",
             "tests": "25253ebd2b1a023cc77ef02fcace534534902543"
           }
+        },
+        {
+          "path": "browser/themes/ThemeVariableMap.sys.mjs",
+          "kind": "file",
+          "sha": "bfe615d8f7699c1a2e320bd103477245ed740116"
+        },
+        {
+          "path": "browser/themes/shared/browser-shared.css",
+          "kind": "file",
+          "sha": "6ca16f4757519bdcabb32cfd3ab8b96a5642f3f7"
+        },
+        {
+          "path": "toolkit/mozapps/extensions/LightweightThemeManager.sys.mjs",
+          "kind": "file",
+          "sha": "70c6fa28ada54322b9e5c6e64c1b3b35c0ccbc97"
         }
       ]
     },

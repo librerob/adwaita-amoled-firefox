@@ -23,9 +23,10 @@ The fixture uses Firefox's Marionette protocol and system access only in the
 throwaway test process. The distributed theme contains neither. No daily
 profile is opened or modified.
 
-Preview captures show browser chrome only. The throwaway process uses Firefox's
-test-only setting to suppress the red remote-control cue, which is an automation
-indicator rather than part of the theme. This setting is not in the package.
+Preview captures show browser chrome only. The red remote-control cue is omitted
+just while drawing the two `preview-*` images, then restored. It is an automation
+indicator rather than part of the theme. Full workflow captures retain it, and
+color samples are taken with the cue present. The package contains no such code.
 
 ## Remaining manual checks
 

@@ -1,14 +1,14 @@
 {
   "manifest_version": 3,
   "name": "Adwaita AMOLED",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "True black, soft blue accents, and Firefox's native Nova design.",
   "author": "librerob",
   "homepage_url": "https://github.com/librerob/adwaita-amoled-firefox",
   "browser_specific_settings": {
     "gecko": {
       "id": "adwaita-amoled-firefox@librerob",
-      "strict_min_version": "159.0.1"
+      "strict_min_version": "159.0"
     }
   },
   "icons": {

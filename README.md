@@ -20,8 +20,8 @@ Browser chrome captured in Firefox 159.0.1 on Linux. Page content is omitted.
 
 ## Try it
 
-This first version is available as source. It has not been signed or listed on
-Mozilla Add-ons yet, so the packaged XPI is for temporary testing.
+The [release archives](https://github.com/librerob/adwaita-amoled-firefox/releases)
+are unsigned packages for Mozilla Add-ons submission or temporary testing.
 
 1. Download this repository with **Code → Download ZIP**, then extract it.
 2. Open `about:debugging#/runtime/this-firefox` in Firefox 159.0.1 or later.
@@ -42,12 +42,14 @@ black lettering.
 | Main text on black | 16.83:1 |
 | Secondary text on the raised surface | 10.13:1 |
 | Pale blue on black | 9.96:1 |
-| White on selected blue | 4.89:1 |
+| White on selected blue | 5.76:1 |
 | Black on pale blue | 9.96:1 |
 
 These are defined sRGB color pairs. Firefox also derives some colors and uses
 the system accent for some controls. The theme does not recolor websites or
-extension-owned panels. See [design notes](docs/design.md) for the mapping and
+extension-owned panels. It requests dark appearance from websites that support
+the browser's color-scheme preference; user overrides still apply.
+See [design notes](docs/design.md) for the mapping and
 [validation](docs/validation.md) for coverage and remaining checks.
 
 ## Development
@@ -62,6 +64,14 @@ python tools/theme.py --check --package
 
 Archives are written to `dist/`. They contain the manifest, icon and license.
 `palette.json` is the color source; `theme/manifest.json` is generated from it.
+
+The separate AMO compatibility job checks Mozilla's live version registry. It
+retries temporary failures and reports service unavailability separately from
+an unsupported version. Offline palette/package tests do not contact AMO.
+
+To publish a GitHub release, run the **Release** workflow from `main` after its
+**Checks** workflow passes. It builds the archives from that checked revision
+and attaches the ZIP, XPI and checksums to the versioned release.
 
 ## Credits
 

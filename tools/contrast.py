@@ -11,6 +11,10 @@ def rgba(value):
     values = [float(v) for v in re.findall(r"[\d.]+", value)]
     if len(values) not in (3, 4):
         raise ValueError(f"Unsupported color: {value}")
+    if value.startswith("color(srgb "):
+        values[:3] = [channel * 255 for channel in values[:3]]
+    elif value.startswith("color("):
+        raise ValueError(f"Unsupported color space: {value}")
     return tuple(values[:3]) + ((values[3] if len(values) == 4 else 1.0),)
 
 

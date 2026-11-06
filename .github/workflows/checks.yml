@@ -20,7 +20,6 @@ jobs:
         with:
           python-version: '3.12'
       - run: python tools/theme.py --check
-      - run: python tools/check_amo.py
       - run: python -m unittest discover -s tests -v
       - run: python tools/theme.py --check --package
       - uses: actions/setup-node@v4
@@ -32,6 +31,17 @@ jobs:
         with:
           name: theme-package
           path: dist/
+
+  amo:
+    name: AMO compatibility
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python tools/check_amo.py
 
   firefox:
     name: Firefox / ${{ matrix.os }}
@@ -50,7 +60,18 @@ jobs:
         id: firefox
         with:
           firefox-version: '159.0.1'
-      - name: Native Firefox theme checks
+      - name: Prepare isolated display
+        if: runner.os == 'Linux'
+        run: |
+          if ! command -v xvfb-run >/dev/null || ! command -v import >/dev/null; then
+            sudo apt-get update
+            sudo apt-get install -y xvfb imagemagick
+          fi
+      - name: Native Firefox theme checks (Linux display)
+        if: runner.os == 'Linux'
+        run: xvfb-run -a -s "-screen 0 1440x1000x24" python tests/firefox_ui.py --headed --firefox "${{ steps.firefox.outputs.firefox-path }}"
+      - name: Native Firefox theme checks (Windows headless)
+        if: runner.os == 'Windows'
         run: python tests/firefox_ui.py --firefox "${{ steps.firefox.outputs.firefox-path }}"
       - uses: actions/upload-artifact@v4
         if: always()

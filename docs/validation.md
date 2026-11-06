@@ -1,5 +1,44 @@
 # Validation
 
+## Current coverage
+
+Version 0.1.2 passed [the Windows/Linux validation run](https://github.com/librerob/adwaita-amoled-firefox/actions/runs/42250708117)
+on 6 November 2026. All 16 offline tests, manifest lint and the live AMO check
+passed. Linux used a visible Firefox window on an isolated display; Windows
+used headless Firefox. Both ran Firefox 159.0.1.
+
+| Native sample on Linux | Measured contrast |
+| --- | ---: |
+| Selected-tab label, all six layouts | 14.76:1 |
+| Focused address-field placeholder | 5.02:1 |
+| Selected address-result title and URL | 5.76:1 |
+| Hovered menu label | 9.44:1 |
+| Hovered menu shortcut hint | 5.43:1 |
+
+The selected address result uses white for both its title and secondary URL.
+The menu shortcut retains Firefox's 69% foreground alpha and still exceeds
+4.5:1 after composition. These samples do not cover every menu or result type.
+
+[Native menu capture](validation-menu.png): the red address-field cue is
+Firefox's automation indicator, retained in this validation screenshot.
+
+The offline suite has 16 tests covering palette roles, compound states,
+packaging, byte-exact UTF-8/LF generation, and AMO retry/error handling.
+The live AMO registry check is a separate CI job. It makes at most three
+requests with ten-second timeouts and short backoff delays. An unavailable
+service exits with status 2; a rejected minimum version exits with status 1.
+Neither an outage nor a cached result is treated as successful validation.
+
+The native fixture also checks the selected-tab outline's color, width and
+contrast in every layout. It samples the computed address placeholder,
+selected history-result text, and hovered menu labels/shortcut hints, including
+opacity and their composed backgrounds. Menu hover is exercised with Firefox's
+pseudo-class test API; this checks native paint rather than pointer navigation.
+Linux also runs with an isolated Xvfb display and captures the actual popup
+widgets using ImageMagick. Document-only captures cannot show those widgets.
+
+## Earlier validation records
+
 Version 0.1.1 corrects the submission minimum from `159.0.1` to `159.0`.
 AMO's application-version registry includes `159.0` but not the patch release.
 The upload form checks that registry separately from the lint report. CI now
@@ -58,6 +97,7 @@ can supply their own colors.
 ```sh
 python tools/theme.py --check
 python -m unittest discover -s tests -v
+python tools/check_amo.py
 python tools/theme.py --check --package
 python tests/firefox_ui.py --firefox /path/to/firefox
 ```
@@ -65,4 +105,10 @@ python tests/firefox_ui.py --firefox /path/to/firefox
 The native run writes `artifacts/firefox/report.json`, screenshots and a Firefox
 log. It needs an installed Firefox binary and an environment that permits a
 local Marionette connection. It creates and deletes its own temporary profile.
+
+For Linux desktop captures, install Xvfb and ImageMagick, then run:
+
+```sh
+xvfb-run -a -s "-screen 0 1440x1000x24" python tests/firefox_ui.py --headed --firefox /path/to/firefox
+```
 

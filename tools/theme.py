@@ -8,7 +8,7 @@ from pathlib import Path
 import zipfile
 
 ROOT = Path(__file__).resolve().parents[1]
-VERSION = "0.1.1"
+VERSION = "0.1.2"
 THEME_ID = "adwaita-amoled-firefox@librerob"
 
 # Keep text, selection fills and identifying borders as separate roles.
@@ -24,7 +24,7 @@ ROLES = {
     "toolbar_field_border_focus": "accent",
     "toolbar_field_highlight": "accent",
     "toolbar_field_highlight_text": "on_accent",
-    "popup": "raised", "popup_text": "foreground", "popup_border": "separator",
+    "popup": "raised", "popup_text": "foreground", "popup_border": "popup_border",
     "popup_highlight": "selection", "popup_highlight_text": "on_selection",
     "sidebar": "background", "sidebar_text": "foreground", "sidebar_border": "separator",
     "ntp_background": "background", "ntp_card_background": "surface", "ntp_text": "foreground",
@@ -60,8 +60,8 @@ def rendered():
 
 def archive_bytes():
     expected = rendered()
-    actual = (ROOT / "theme/manifest.json").read_text()
-    if actual != expected:
+    actual = (ROOT / "theme/manifest.json").read_bytes()
+    if actual != expected.encode("utf-8"):
         raise SystemExit("Manifest is stale. Run python tools/theme.py first.")
     # Fixed metadata makes locally and CI-built archives byte-for-byte comparable.
     payloads = {"manifest.json": expected.encode(), "icon.svg": (ROOT / "theme/icon.svg").read_bytes(), "LICENSE": (ROOT / "LICENSE").read_bytes()}
@@ -98,8 +98,8 @@ if __name__ == "__main__":
     args = parser.parse_args()
     target = ROOT / "theme/manifest.json"
     if args.check:
-        if not target.exists() or target.read_text() != rendered():
-            raise SystemExit("Manifest is stale. Run python tools/theme.py.")
+        if not target.exists() or target.read_bytes() != rendered().encode("utf-8"):
+            raise SystemExit("Manifest bytes differ from generated UTF-8/LF output. Run python tools/theme.py.")
         print("Manifest matches palette.")
     else:
         target.write_text(rendered(), encoding="utf-8", newline="\n")

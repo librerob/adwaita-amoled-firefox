@@ -7,6 +7,17 @@ The frame stays black. The current tab has a raised surface and a pale blue
 outline. Menus and the address bar use small steps in brightness to keep the
 controls distinct. Firefox keeps its own Nova layout, spacing and shapes.
 
+![Horizontal tabs in Adwaita AMOLED](docs/preview-horizontal.png)
+
+<details>
+<summary>Vertical tabs</summary>
+
+![Vertical tabs in Adwaita AMOLED](docs/preview-vertical.png)
+
+</details>
+
+Browser chrome captured in Firefox 159.0.1 on Linux. Page content is omitted.
+
 ## Try it
 
 This first version is available as source. It has not been signed or listed on

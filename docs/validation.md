@@ -1,5 +1,11 @@
 # Validation
 
+On 6 November 2026, [the validation run](https://github.com/librerob/adwaita-amoled-firefox/actions/runs/42244907800)
+passed all eight palette/package tests, manifest lint with warnings treated as
+errors, and native Firefox 159.0.1 checks on Windows and Linux. Each browser run
+covered six layout/system-appearance combinations and the additional states
+described below. The committed previews were captured by that run.
+
 ## Automated checks
 
 The palette suite checks generated output, paired selections, identifying

@@ -73,7 +73,7 @@ class ThemeTests(unittest.TestCase):
             self.assertEqual(package(temp).read_bytes(), first)
             self.assertEqual(xpi.with_suffix(".zip").read_bytes(), first)
             with zipfile.ZipFile(xpi) as archive:
-                self.assertEqual(archive.namelist(), ["icon.svg", "manifest.json"])
+                self.assertEqual(archive.namelist(), ["LICENSE", "icon.svg", "manifest.json"])
                 self.assertEqual(json.loads(archive.read("manifest.json")), self.m)
                 self.assertIsNone(archive.testzip())
 

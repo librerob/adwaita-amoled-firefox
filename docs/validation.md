@@ -23,6 +23,10 @@ The fixture uses Firefox's Marionette protocol and system access only in the
 throwaway test process. The distributed theme contains neither. No daily
 profile is opened or modified.
 
+Preview captures show browser chrome only. The throwaway process uses Firefox's
+test-only setting to suppress the red remote-control cue, which is an automation
+indicator rather than part of the theme. This setting is not in the package.
+
 ## Remaining manual checks
 
 - Actual OLED behavior at different brightness levels and ambient lighting.

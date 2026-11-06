@@ -44,7 +44,7 @@ def manifest():
         "author": "librerob",
         "homepage_url": "https://github.com/librerob/adwaita-amoled-firefox",
         "browser_specific_settings": {"gecko": {
-            "id": THEME_ID, "strict_min_version": "159.0"
+            "id": THEME_ID, "strict_min_version": "159.0.1"
         }},
         "icons": {"48": "icon.svg", "96": "icon.svg"},
         "theme": {"colors": colors, "properties": {
@@ -66,7 +66,7 @@ def package(destination=None):
     destination.mkdir(parents=True, exist_ok=True)
     name = f"adwaita-amoled-firefox-{VERSION}"
     # Fixed metadata makes locally and CI-built archives byte-for-byte comparable.
-    payloads = {"manifest.json": expected.encode(), "icon.svg": (ROOT / "theme/icon.svg").read_bytes()}
+    payloads = {"manifest.json": expected.encode(), "icon.svg": (ROOT / "theme/icon.svg").read_bytes(), "LICENSE": (ROOT / "LICENSE").read_bytes()}
     for suffix in ("zip", "xpi"):
         target = destination / f"{name}.{suffix}"
         with zipfile.ZipFile(target, "w", compression=zipfile.ZIP_DEFLATED, compresslevel=9) as archive:

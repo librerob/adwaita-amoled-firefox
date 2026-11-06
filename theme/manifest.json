@@ -8,7 +8,7 @@
   "browser_specific_settings": {
     "gecko": {
       "id": "adwaita-amoled-firefox@librerob",
-      "strict_min_version": "159.0"
+      "strict_min_version": "159.0.1"
     }
   },
   "icons": {

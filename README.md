@@ -13,7 +13,7 @@ This first version is available as source. It has not been signed or listed on
 Mozilla Add-ons yet, so the packaged XPI is for temporary testing.
 
 1. Download this repository with **Code → Download ZIP**, then extract it.
-2. Open `about:debugging#/runtime/this-firefox` in Firefox 159 or later.
+2. Open `about:debugging#/runtime/this-firefox` in Firefox 159.0.1 or later.
 3. Choose **Load Temporary Add-on** and select `theme/manifest.json`.
 
 The theme lasts until Firefox restarts. Switch themes in `about:addons` to remove
@@ -49,7 +49,7 @@ python -m unittest discover -s tests -v
 python tools/theme.py --check --package
 ```
 
-Archives are written to `dist/`. They contain only the manifest and icon.
+Archives are written to `dist/`. They contain the manifest, icon and license.
 `palette.json` is the color source; `theme/manifest.json` is generated from it.
 
 ## Credits

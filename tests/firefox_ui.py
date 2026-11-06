@@ -136,6 +136,7 @@ def main():
             "browser.startup.homepage_override.mstone": "ignore",
             "browser.aboutwelcome.enabled": False,
             "browser.nova.enabled": True,
+            "browser.chrome.disableRemoteControlCueForTests": True,
             "browser.newtabpage.activity-stream.feeds.section.topstories": False,
             "browser.newtabpage.activity-stream.showSponsored": False,
             "browser.newtabpage.activity-stream.showSponsoredTopSites": False,
@@ -144,7 +145,7 @@ def main():
             "browser.tabs.warnOnClose": False,
         }
         Path(temp, "user.js").write_text("".join(f"user_pref({json.dumps(k)}, {json.dumps(v)});\n" for k, v in prefs.items()))
-        environment = dict(os.environ, MOZ_REMOTE_ALLOW_SYSTEM_ACCESS="1", MOZ_NO_REMOTE="1")
+        environment = dict(os.environ, MOZ_REMOTE_ALLOW_SYSTEM_ACCESS="1", MOZ_NO_REMOTE="1", MOZ_AUTOMATION="1")
         log = open(output / "firefox.log", "w", encoding="utf-8")
         process = subprocess.Popen([args.firefox, "--headless", "--marionette", "--no-remote", "--profile", temp, "--width", "1360", "--height", "900", "about:blank"], env=environment, stdout=log, stderr=subprocess.STDOUT)
         client = None

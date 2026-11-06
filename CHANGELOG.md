@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.1.2
+
+- Clearer menu edges on black pages.
+- Slightly deeper selection blue with more contrast for white labels.
+- Byte-exact manifest checks for UTF-8 and LF line endings.
+- Bounded retries and a distinct service-unavailable result for the AMO check.
+
 ## 0.1.1
 
 - Use Firefox 159.0 as the minimum version recognized by Mozilla Add-ons.

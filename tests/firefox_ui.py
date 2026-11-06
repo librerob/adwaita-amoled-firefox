@@ -17,7 +17,7 @@ import time
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "tools"))
 from contrast import over, ratio, rgba
-from theme import THEME_ID, package
+from theme import THEME_ID, manifest, package
 
 
 class Marionette:
@@ -87,7 +87,8 @@ const style = selector => {
   if (!el || !el.getClientRects().length) throw new Error('Missing visible element: ' + selector);
   const s = win.getComputedStyle(el);
   return {selector, color:s.color, background:s.backgroundColor, border:s.borderColor,
-          outline:s.outlineColor, opacity:s.opacity, width:el.getBoundingClientRect().width};
+          outline:s.outlineColor, outlineWidth:s.outlineWidth, outlineStyle:s.outlineStyle,
+          opacity:s.opacity, width:el.getBoundingClientRect().width};
 };
 const root = win.getComputedStyle(doc.documentElement);
 return {
@@ -104,6 +105,41 @@ return {
   selectedTab:style('.tabbrowser-tab[selected] .tab-background')
 };
 """
+
+TEXT_PAINT = """
+const parentOf = node => node.assignedSlot || node.parentElement || node.getRootNode()?.host;
+const textPaint = (el, pseudo=null, boundary=null, baseBackground='#000000') => {
+  const s=win.getComputedStyle(el,pseudo);
+  let opacity=Number(s.opacity), backgrounds=[];
+  if(!pseudo) backgrounds.push(s.backgroundColor);
+  for(let parent=pseudo ? el : parentOf(el);parent;parent=parentOf(parent)) {
+    const ps=win.getComputedStyle(parent);
+    opacity*=Number(ps.opacity);
+    backgrounds.push(ps.backgroundColor);
+    if(parent===boundary) break;
+  }
+  return {text:pseudo ? s.content : el.textContent || el.getAttribute('value') || '',
+          selector:el.id || el.className?.baseVal || String(el.className), pseudo,
+          color:s.color,opacity,backgrounds,baseBackground};
+};
+const deepElements = root => [...root.children,...(root.shadowRoot?.children || [])]
+  .flatMap(el=>[el,...deepElements(el)]);
+"""
+
+
+def measure_text(samples, state, report):
+    if not samples:
+        raise AssertionError(f"No visible text sampled for {state}")
+    for sample in samples:
+        background = rgba(sample.get("baseBackground", "#000000"))
+        for layer in reversed(sample["backgrounds"]):
+            background = over(layer, background)
+        foreground = rgba(sample["color"])
+        foreground = foreground[:3] + (foreground[3] * sample["opacity"],)
+        value = ratio(over(foreground, background), background)
+        result = dict(sample, state=state, ratio=value)
+        report["runtimePairs"].append(result)
+        assert value >= 4.5, (state, sample["text"], value, sample)
 
 
 def screenshot(client, target, height=None):
@@ -149,6 +185,9 @@ def main():
             "datareporting.policy.dataSubmissionEnabled": False,
             "toolkit.telemetry.enabled": False,
             "browser.tabs.warnOnClose": False,
+            "browser.search.suggest.enabled": False,
+            "browser.urlbar.suggest.searches": False,
+            "browser.urlbar.speculativeConnect.enabled": False,
         }
         Path(temp, "user.js").write_text("".join(f"user_pref({json.dumps(k)}, {json.dumps(v)});\n" for k, v in prefs.items()))
         environment = dict(os.environ, MOZ_REMOTE_ALLOW_SYSTEM_ACCESS="1", MOZ_NO_REMOTE="1")
@@ -187,6 +226,10 @@ def main():
                     label = sample["labels"][0]
                     value = ratio(over(label["color"], tab_bg), tab_bg)
                     assert value >= 4.5, (sample["name"], value)
+                    assert tab["outlineStyle"] not in ("none", "hidden"), tab
+                    assert float(tab["outlineWidth"].removesuffix("px")) >= 1, tab
+                    assert ratio(over(tab["outline"], tab_bg), tab_bg) >= 3, tab
+                    assert rgba(tab["outline"])[:3] == rgba(manifest()["theme"]["colors"]["tab_line"])[:3], tab
                     report["runtimePairs"].append({"state": sample["name"], "role": "selected tab label", "ratio": value})
                     report["samples"].append(sample)
                     screenshot(client, output / (sample["name"] + ".png"))
@@ -195,11 +238,52 @@ def main():
             client.js(WINDOW + "win.gURLBar.focus(); win.gURLBar.inputField.select(); return true;")
             client.wait(WINDOW + "return doc.activeElement && (doc.activeElement.id === 'urlbar-input' || doc.activeElement.closest('#urlbar'));")
             screenshot(client, output / "address-focus.png")
+            placeholder = client.js(WINDOW + TEXT_PAINT + "return textPaint(doc.getElementById('urlbar-input'),'::placeholder',doc.getElementById('urlbar'),win.getComputedStyle(doc.documentElement).getPropertyValue('--toolbar-field-background-color-focus').trim());")
+            measure_text([placeholder], "address placeholder", report)
+            client.js(WINDOW + """
+              const {PlacesUtils}=ChromeUtils.importESModule('resource://gre/modules/PlacesUtils.sys.mjs');
+              return PlacesUtils.history.insert({url:'https://example.test/amoled-reading',
+                title:'AMOLED reading notes',visits:[{date:new Date()}]}).then(()=>{
+                  win.gURLBar.value='amoled'; return win.gURLBar.startQuery();
+                });
+            """)
+            client.wait(WINDOW + "return win.gURLBar.view.isOpen && [...doc.querySelectorAll('.urlbarView-row')].some(row=>row.getClientRects().length && row.textContent.includes('AMOLED reading notes'));")
+            client.js(WINDOW + "const rows=[...doc.querySelectorAll('.urlbarView-row')].filter(row=>row.getClientRects().length); win.gURLBar.view.selectedRowIndex=rows.findIndex(row=>row.textContent.includes('AMOLED reading notes')); return true;")
+            selected_result = client.js(WINDOW + TEXT_PAINT + """
+              const row=doc.querySelector('.urlbarView-row[selected]');
+              if(!row) throw new Error('Address result was not selected');
+              return [...row.querySelectorAll('.urlbarView-title,.urlbarView-url,.urlbarView-action')]
+                .filter(el=>el.getClientRects().length && el.textContent.trim()).map(el=>textPaint(el,null,row,
+                  win.getComputedStyle(doc.documentElement).getPropertyValue('--toolbar-field-background-color-focus').trim()));
+            """)
+            measure_text(selected_result, "selected address result", report)
+            screenshot(client, output / "selected-address-result.png", 520)
+            client.js(WINDOW + "win.gURLBar.view.close(); return true;")
             client.js(WINDOW + "win.gURLBar.blur(); win.PanelUI.show(); return true;")
             client.wait(WINDOW + "return doc.getElementById('appMenu-popup').state === 'open';")
             menu = client.js(WINDOW + "const el=doc.getElementById('appMenu-popup'); const s=win.getComputedStyle(el); return {color:s.color,background:s.backgroundColor};")
             report["menu"] = menu
             screenshot(client, output / "menu.png")
+            menu_text = client.js(WINDOW + TEXT_PAINT + """
+              const panel=doc.getElementById('appMenu-popup');
+              const row=[...panel.querySelectorAll('toolbarbutton.subviewbutton')].find(el=>
+                el.getClientRects().length && !el.disabled && el.getAttribute('shortcut'));
+              if(!row) throw new Error('No enabled menu row with a shortcut');
+              win.InspectorUtils.addPseudoClassLock(row,':hover');
+              const elements=deepElements(row).filter(el=>el.getClientRects().length &&
+                (el.classList?.contains('toolbarbutton-text') || el.classList?.contains('toolbarbutton-accel')));
+              const base=win.getComputedStyle(doc.documentElement).getPropertyValue('--panel-background-color').trim();
+              let samples=elements.map(el=>textPaint(el,null,row,base));
+              for(const pseudo of ['::before','::after']) {
+                const s=win.getComputedStyle(row,pseudo);
+                if(s.content && !['none','normal','""'].includes(s.content)) samples.push(textPaint(row,pseudo,row,base));
+              }
+              return {row:row.id,samples};
+            """)
+            report["selectedMenuRow"] = menu_text
+            measure_text(menu_text["samples"], "hovered menu row and shortcut", report)
+            screenshot(client, output / "selected-menu.png")
+            client.js(WINDOW + "win.InspectorUtils.removePseudoClassLock(doc.getElementById(arguments[0]),':hover'); return true;", menu_text["row"])
             client.js(WINDOW + "win.PanelUI.hide(); Services.prefs.setBoolPref('sidebar.verticalTabs',false); return true;")
             client.js(WINDOW + "win.OpenBrowserWindow({private:true}); return true;")
             client.wait(WINDOW + "return ChromeUtils.importESModule('resource://gre/modules/PrivateBrowsingUtils.sys.mjs').PrivateBrowsingUtils.isWindowPrivate(win) && doc.documentElement.hasAttribute('lwtheme');")

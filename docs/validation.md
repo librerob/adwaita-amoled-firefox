@@ -1,5 +1,22 @@
 # Validation
 
+## Current coverage
+
+The offline suite has 16 tests covering palette roles, compound states,
+packaging, byte-exact UTF-8/LF generation, and AMO retry/error handling.
+The live AMO registry check is a separate CI job. It makes at most three
+requests with ten-second timeouts and short backoff delays. An unavailable
+service exits with status 2; a rejected minimum version exits with status 1.
+Neither an outage nor a cached result is treated as successful validation.
+
+The native fixture also checks the selected-tab outline's color, width and
+contrast in every layout. It samples the computed address placeholder,
+selected history-result text, and hovered menu labels/shortcut hints, including
+opacity and their composed backgrounds. Menu hover is exercised with Firefox's
+pseudo-class test API; this checks native paint rather than pointer navigation.
+
+## Earlier validation records
+
 Version 0.1.1 corrects the submission minimum from `159.0.1` to `159.0`.
 AMO's application-version registry includes `159.0` but not the patch release.
 The upload form checks that registry separately from the lint report. CI now

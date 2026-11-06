@@ -5,10 +5,11 @@
   "foreground": "#e6e6e6",
   "secondary": "#c0c0c0",
   "accent": "#8ab4f8",
-  "selection": "#2d6be0",
+  "selection": "#2a5fd0",
   "on_selection": "#ffffff",
   "on_accent": "#000000",
   "control_border": "#686868",
+  "popup_border": "#666666",
   "separator": "#2a2a2a",
   "hover": "rgba(255, 255, 255, 0.08)",
   "pressed": "rgba(255, 255, 255, 0.12)"

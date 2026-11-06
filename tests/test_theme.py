@@ -20,8 +20,13 @@ class ThemeTests(unittest.TestCase):
         self.m = manifest()
 
     def test_generation(self):
-        self.assertEqual((ROOT / "theme/manifest.json").read_text(), rendered())
+        self.assertEqual((ROOT / "theme/manifest.json").read_bytes(), rendered().encode("utf-8"))
         self.assertEqual(set(ROLES.values()), set(self.p))
+
+    def test_line_endings(self):
+        actual = (ROOT / "theme/manifest.json").read_bytes()
+        self.assertNotIn(b"\r", actual)
+        self.assertNotEqual(rendered().replace("\n", "\r\n").encode(), actual)
 
     def test_static_boundary(self):
         self.assertFalse(set(self.m) & {"permissions", "host_permissions", "background", "content_scripts", "theme_experiment"})
@@ -55,10 +60,16 @@ class ThemeTests(unittest.TestCase):
         self.assertEqual(len(samples), 18)
 
     def test_selection_pairs(self):
-        self.assertGreaterEqual(ratio(self.p["on_selection"], self.p["selection"]), 4.5)
+        self.assertGreaterEqual(ratio(self.p["on_selection"], self.p["selection"]), 5.5)
         self.assertGreaterEqual(ratio(self.p["on_accent"], self.p["accent"]), 7)
-        # Guard against accidentally applying the normal label color to a blue fill.
-        self.assertLess(ratio(self.p["foreground"], self.p["selection"]), 4.5)
+        # Muted and accent labels must not replace the paired selected foreground.
+        for foreground in ("secondary", "accent"):
+            self.assertLess(ratio(self.p[foreground], self.p["selection"]), 4.5)
+
+    def test_popup_boundary(self):
+        for surface in ("background", "raised"):
+            self.assertGreaterEqual(ratio(self.p["popup_border"], self.p[surface]), 3)
+        self.assertEqual(self.m["theme"]["colors"]["popup_border"], self.p["popup_border"])
 
     def test_indicators(self):
         for surface in ("background", "surface", "raised"):

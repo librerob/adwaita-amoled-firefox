@@ -24,8 +24,9 @@ markers, audio icons and private-window indicators remain Firefox's own.
 | Foreground | `#e6e6e6` | Ordinary labels |
 | Secondary | `#c0c0c0` | Inactive tabs and toolbar icons |
 | Accent | `#8ab4f8` | Tab outline, themeable focus border, attention icons |
-| Selection | `#2d6be0` | Menu/address-result selection with white labels |
+| Selection | `#2a5fd0` | Menu/address-result selection with white labels |
 | Control border | `#686868` | Address-field boundary |
+| Popup border | `#666666` | Menu edges against dark surfaces |
 | Separator | `#2a2a2a` | Decorative divisions |
 
 The field border is quieter than the desktop theme's `#808080`, while exceeding
@@ -37,10 +38,14 @@ same paint work over the frame and raised tab. The tests composite both over
 each authored surface, then check primary/secondary labels at 7:1 and blue
 indicators at 3:1. They also test the opaque selection pairs separately.
 
-The selected blue fill with white text reaches 4.89:1. It is not a 7:1 pair.
-Changing its text to the ordinary softened foreground would drop below 4.5:1,
-so the selected foreground is explicitly white. Pale-blue text selection has
-an explicitly black foreground for the same reason.
+The selected blue fill with white text reaches 5.76:1. It is not a 7:1 pair.
+Muted or pale-blue text on this fill would still fall below 4.5:1, so the
+selected foreground is explicitly white. Pale-blue text selection has an
+explicitly black foreground for the same reason.
+
+The popup border reaches 3.21:1 against `#141414` and 3.66:1 against black.
+The menus keep their dark interiors while their edges remain visible over
+black page content. Other separators stay quiet and decorative.
 
 ## Firefox boundaries
 

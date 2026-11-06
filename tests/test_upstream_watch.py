@@ -5,6 +5,7 @@ import io
 import json
 import os
 from pathlib import Path
+import re
 import sys
 import unittest
 from unittest.mock import patch
@@ -18,6 +19,12 @@ MANIFEST = {"browser_specific_settings": {"gecko": {"strict_min_version": "159.0
 
 
 class WatchTests(unittest.TestCase):
+    def test_linter_baseline_matches_the_actual_ci_pin(self):
+        root = Path(__file__).resolve().parents[1]
+        config = json.loads((root / "maintenance/upstream-watch.json").read_text())
+        workflow = (root / ".github/workflows/checks.yml").read_text()
+        self.assertEqual(re.findall(r"web-ext@([0-9]+\.[0-9]+\.[0-9]+)", workflow), [config["web_ext"]])
+
     def setUp(self):
         self.config = {
             "schema_version": 1, "captured_on": "2026-11-06", "web_ext": "8.9.0",

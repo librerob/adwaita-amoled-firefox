@@ -7,7 +7,7 @@
     "LATEST_FIREFOX_DEVEL_VERSION": "160.0b5",
     "FIREFOX_NIGHTLY": "162.0a1"
   },
-  "web_ext": "8.9.0",
+  "web_ext": "10.8.0",
   "repositories": [
     {
       "repo": "mozilla-firefox/firefox",

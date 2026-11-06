@@ -26,7 +26,7 @@ jobs:
         with:
           node-version: '22'
       - name: Firefox manifest lint
-        run: npx --yes web-ext@8.9.0 lint --source-dir theme --warnings-as-errors
+        run: npx --yes web-ext@10.8.0 lint --source-dir theme --warnings-as-errors
       - uses: actions/upload-artifact@v4
         with:
           name: theme-package

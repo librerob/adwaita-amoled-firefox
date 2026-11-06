@@ -118,7 +118,7 @@ const textPaint = (el, pseudo=null, boundary=null, baseBackground='#000000') => 
     backgrounds.push(ps.backgroundColor);
     if(parent===boundary) break;
   }
-  return {text:pseudo ? s.content : el.textContent || el.getAttribute('value') || '',
+  return {text:pseudo==='::placeholder' ? el.getAttribute('placeholder') : pseudo ? s.content : el.textContent || el.getAttribute('value') || '',
           selector:el.id || el.className?.baseVal || String(el.className), pseudo,
           color:s.color,opacity,backgrounds,baseBackground};
 };

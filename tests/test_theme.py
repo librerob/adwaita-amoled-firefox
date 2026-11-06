@@ -9,7 +9,7 @@ import zipfile
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "tools"))
-from contrast import over, ratio
+from contrast import over, ratio, rgba
 from check_amo import check_version
 from theme import ROLES, manifest, package, rendered
 
@@ -84,6 +84,7 @@ class ThemeTests(unittest.TestCase):
         self.assertEqual(ratio("#777777", "#777777"), 1)
         self.assertAlmostEqual(ratio("#ffffff", "#2d6be0"), 4.894, places=3)
         self.assertEqual(over("rgba(255,255,255,0.5)", "#000000"), (127.5, 127.5, 127.5, 1))
+        self.assertEqual(rgba("color(srgb 1 0.5 0 / 0.54)"), (255, 127.5, 0, 0.54))
 
     def test_archive(self):
         with tempfile.TemporaryDirectory() as temp:

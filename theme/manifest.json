@@ -1,0 +1,60 @@
+{
+  "manifest_version": 3,
+  "name": "Adwaita AMOLED",
+  "version": "0.1.0",
+  "description": "True black, soft blue accents, and Firefox's native Nova design.",
+  "author": "librerob",
+  "homepage_url": "https://github.com/librerob/adwaita-amoled-firefox",
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "adwaita-amoled-firefox@librerob",
+      "strict_min_version": "159.0.1"
+    }
+  },
+  "icons": {
+    "48": "icon.svg",
+    "96": "icon.svg"
+  },
+  "theme": {
+    "colors": {
+      "frame": "#000000",
+      "frame_inactive": "#000000",
+      "toolbar": "#000000",
+      "toolbar_text": "#e6e6e6",
+      "tab_background_text": "#c0c0c0",
+      "tab_selected": "#141414",
+      "tab_text": "#e6e6e6",
+      "tab_line": "#8ab4f8",
+      "icons": "#c0c0c0",
+      "icons_attention": "#8ab4f8",
+      "toolbar_field": "#0f0f0f",
+      "toolbar_field_text": "#e6e6e6",
+      "toolbar_field_border": "#686868",
+      "toolbar_field_focus": "#141414",
+      "toolbar_field_text_focus": "#e6e6e6",
+      "toolbar_field_border_focus": "#8ab4f8",
+      "toolbar_field_highlight": "#8ab4f8",
+      "toolbar_field_highlight_text": "#000000",
+      "popup": "#141414",
+      "popup_text": "#e6e6e6",
+      "popup_border": "#2a2a2a",
+      "popup_highlight": "#2d6be0",
+      "popup_highlight_text": "#ffffff",
+      "sidebar": "#000000",
+      "sidebar_text": "#e6e6e6",
+      "sidebar_border": "#2a2a2a",
+      "ntp_background": "#000000",
+      "ntp_card_background": "#0f0f0f",
+      "ntp_text": "#e6e6e6",
+      "button_background_hover": "rgba(255, 255, 255, 0.08)",
+      "button_background_active": "rgba(255, 255, 255, 0.12)",
+      "toolbar_bottom_separator": "#2a2a2a",
+      "toolbar_vertical_separator": "#2a2a2a",
+      "toolbar_top_separator": "rgba(0, 0, 0, 0)"
+    },
+    "properties": {
+      "color_scheme": "dark",
+      "content_color_scheme": "dark"
+    }
+  }
+}

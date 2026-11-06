@@ -1,0 +1,16 @@
+{
+  "background": "#000000",
+  "surface": "#0f0f0f",
+  "raised": "#141414",
+  "foreground": "#e6e6e6",
+  "secondary": "#c0c0c0",
+  "accent": "#8ab4f8",
+  "selection": "#2d6be0",
+  "on_selection": "#ffffff",
+  "on_accent": "#000000",
+  "control_border": "#686868",
+  "separator": "#2a2a2a",
+  "hover": "rgba(255, 255, 255, 0.08)",
+  "pressed": "rgba(255, 255, 255, 0.12)"
+}
+

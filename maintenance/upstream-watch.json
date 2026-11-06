@@ -1,0 +1,168 @@
+{
+  "schema_version": 1,
+  "captured_on": "2026-11-06",
+  "report_issue": 5,
+  "versions": {
+    "LATEST_FIREFOX_VERSION": "159.0.1",
+    "LATEST_FIREFOX_DEVEL_VERSION": "160.0b5",
+    "FIREFOX_NIGHTLY": "162.0a1"
+  },
+  "web_ext": "8.9.0",
+  "repositories": [
+    {
+      "repo": "mozilla-firefox/firefox",
+      "branch": "main",
+      "baseline_commit": "d9bd6be9a67efb1c2667ef91a89856f35eb7cf5e",
+      "paths": [
+        {
+          "path": "toolkit/components/extensions/schemas/theme.json",
+          "kind": "file",
+          "sha": "c818902a1ae0695d903583c3a35257bb23129343"
+        },
+        {
+          "path": "toolkit/components/extensions/parent/ext-theme.js",
+          "kind": "file",
+          "sha": "f6ea1ff9521fefbc5d5e736fab4116355aa6f9f0"
+        },
+        {
+          "path": "toolkit/modules/LightweightThemeConsumer.sys.mjs",
+          "kind": "file",
+          "sha": "68fab52af5c662add9b10990b19978528aa0b430"
+        },
+        {
+          "path": "browser/themes/shared/browser-colors.css",
+          "kind": "file",
+          "sha": "03f17a5fef7add4b6a5db1e48d0ba14fc9801318"
+        },
+        {
+          "path": "browser/themes/shared/tabbrowser",
+          "kind": "directory",
+          "entries": {
+            "connecting.png": "e564fb5708f3d9da4c623bb3bdfccb960566e327",
+            "connecting@2x.png": "97e2b2eb67ecc58e98dd839187143ab6870699e5",
+            "content-area.css": "8380498a7f58c040cca7e00b737f08033a81e80b",
+            "crashed.svg": "85f3d85141b2d700e1b6bde51f63fdca3a6d2b4b",
+            "ctrlTab.css": "382383ec2c9bcaa7dcad1f55dabdcf27a2f2f333",
+            "fullscreen-and-pointerlock.css": "9f59b7201c89003fe094b61094bf33d1e7b470e3",
+            "loading.svg": "c4de95750c7f1ac2ef100c499bea926173d87804",
+            "tab-audio-blocked-circle-12.svg": "985f988bd720f5b49e87223f7a3c8f107b95cc06",
+            "tab-audio-blocked-small.svg": "a83917915f3cc057c3245b4ddb6302d5c91c252b",
+            "tab-audio-muted-small.svg": "848dd4d00bdadc5337963c24927f9711e5cb2720",
+            "tab-audio-playing-small.svg": "b0218045009165fa8f9a08876e61a9307cf95cdc",
+            "tab-drag-indicator.svg": "d195802641bfac500ec93424a3c299c221054e8b",
+            "tab-group-chicklet.svg": "144ea66a848f3d943ddd199cc6febe43f8c33ab7",
+            "tab-group-label-22.svg": "717aee803fc01b0cfcacf84725bbfda574ec1ffc",
+            "tab-groups-list.css": "80e2756ae2c1b34c498db743d44063c3fe5dffaf",
+            "tab-groups.svg": "0d2262b0bf99cad033eca54af80b220008035b11",
+            "tab-hover-preview.css": "f1b2e9bb725e3234acdd139fda30a715d5d93ce8",
+            "tab.nova.tokens.json": "cfc1cc7d165ff27db1b85eee261a3b7778bc8c1e",
+            "tab.tokens.css": "04e41efd3e6191a2ab2575252a7c720e748f497c",
+            "tab.tokens.json": "c4b2f455fe1f4510686fabcbf101d77a722f40ac",
+            "tabs-navbar.tokens.css": "e944a595ced95fdfe6660aa4007e71593ec0266a",
+            "tabs-navbar.tokens.json": "a86fde1e5091b1dfa3bda1f082d037f5fb83152e",
+            "tabs.css": "ba9b80e0570d3f1dee3f47607817e793f4f0d4a2"
+          }
+        },
+        {
+          "path": "browser/themes/shared/urlbar.css",
+          "kind": "file",
+          "sha": "1281c791807bd67571cee192cd3c080c73b176f9"
+        },
+        {
+          "path": "browser/themes/shared/urlbar",
+          "kind": "directory",
+          "entries": {
+            "dynamic-results.css": "2dd8704ce2894d648cea622fb4cfe739d34d68ae",
+            "engine-wordmarks": "04f4fdec2ef52ecbac16adc628594c0c78b3e717",
+            "icons": "10beab7260962110bd662d35e7e4b6d77d9330ff",
+            "tokens.css": "3cf0996338bb6a03cc7f7372f72ece54e55cfa72",
+            "urlbar.nova.tokens.json": "60f2ca917954abaf849853c7a326a567017b243a",
+            "urlbar.tokens.css": "6a1976424b0039cd5645466315bddf994a23b93e",
+            "urlbar.tokens.json": "fa5c5c5a015540650d601c4f17bbff9398a22edc",
+            "urlbarview.nova.tokens.json": "c5e2e6bbd2f2791ef84b2aa84a5c7e74db23a791",
+            "urlbarview.tokens.css": "4cbfb518fb300dfc3d438b78321c4ac07aa05462",
+            "urlbarview.tokens.json": "8d77f5379b508d086414b6dbf2ffa41058cd65b6",
+            "variables.css": "661afde13b730a18bc6f94fb8ecb2d65b9e81ca0",
+            "view-nova.css": "700f21aea38840ffc94d566fa56d980eda6a0cb1",
+            "view-proton.css": "ef6f35e8773593a94071789b760da32f96f3ab31",
+            "view.css": "bd4c469dc9ae45287746310097b3d1e3013d4bea"
+          }
+        },
+        {
+          "path": "browser/themes/shared/sidebar.css",
+          "kind": "file",
+          "sha": "432bd0ac0177c2718e58f716288a65621fb65c76"
+        },
+        {
+          "path": "browser/themes/shared/sidebar",
+          "kind": "directory",
+          "entries": {
+            "firefox.svg": "fece69447f6eb874ca17c392096b7db1e0065b27",
+            "foxy.svg": "6bc9534c8851123ba7b7ed28f93de7fd08388bf2",
+            "gmail.svg": "df143f605cf072611233619b8f6e8e55bdbe2701",
+            "kit-history-import.svg": "7a7979975c6b61ffca1007f4f3e0faef43d198bf",
+            "kit-page-history.svg": "2ddcf3bff7610054dd47f51e3fe13b67550190fe",
+            "kit-pinned-tabs-promo.svg": "932172ae7fe9d91ca429ed27a369b40cb42e72ae",
+            "kit-qr-tabs-devices-empty.svg": "d2ce87e34a46152537393552301b61ad955e795f",
+            "kit-tabs-devices-error.svg": "26ee7b36abdb664651740106d93c393cbca34d44",
+            "kit-tabs-devices.svg": "b0cb43646af19dea0470f90438e1025237480826",
+            "slack.svg": "4f66241287a5ca4a2c11bc32800c40231c20ceb7"
+          }
+        },
+        {
+          "path": "browser/themes/shared/toolbarbuttons.css",
+          "kind": "file",
+          "sha": "e0375810dd2a631490ebc65dbb6d082d00a14216"
+        },
+        {
+          "path": "toolkit/themes/shared/popup.css",
+          "kind": "file",
+          "sha": "6b925f58d0dc28305da47054cd3711456149b2b1"
+        },
+        {
+          "path": "toolkit/themes/shared/menu.css",
+          "kind": "file",
+          "sha": "891d44e2b0d3a2b7f0ebeb8ddda6f38365424c33"
+        },
+        {
+          "path": "toolkit/themes/shared/design-system",
+          "kind": "directory",
+          "entries": {
+            "config": "8e8201421b5d96c63aadb339b24a22bd8c8aae7f",
+            "dist": "4a7d5da1c0c2e6489ebd94d1d5284a3d34f3c086",
+            "docs": "f4605e70051ae47c7437603a6dd3c06a11822fb9",
+            "package-lock.json": "594deaef4d9d6fb9d82e141ba60a5b2a874d36ca",
+            "package.json": "4637b37d7cdc35446be8366e0d4c9f86e67dbe64",
+            "src": "97850f4f4dfce6eccf3a7b687837bf7e77d218b2",
+            "storybook": "4fde853e505dce96d85ac72cc4c08acd2c2ea0af",
+            "tests": "25253ebd2b1a023cc77ef02fcace534534902543"
+          }
+        }
+      ]
+    },
+    {
+      "repo": "mdn/content",
+      "branch": "main",
+      "baseline_commit": "86e6a39c09408844137f307b83d35eca43d5cfda",
+      "paths": [
+        {
+          "path": "files/en-us/mozilla/add-ons/webextensions/manifest.json/theme/index.md",
+          "kind": "file",
+          "sha": "ce295787219436cda5252c6289773418db057ac3"
+        }
+      ]
+    },
+    {
+      "repo": "mdn/browser-compat-data",
+      "branch": "main",
+      "baseline_commit": "04dbf32f853d6392ed74c7ed272ce19215dade19",
+      "paths": [
+        {
+          "path": "webextensions/manifest/theme.json",
+          "kind": "file",
+          "sha": "5f83b9e7dcf841bc547b0916f30e0c80335b20dd"
+        }
+      ]
+    }
+  ]
+}

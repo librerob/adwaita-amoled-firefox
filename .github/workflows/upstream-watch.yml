@@ -1,0 +1,166 @@
+name: Firefox upstream watch
+
+on:
+  schedule:
+    - cron: '37 8 * * 1'
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/upstream-watch.yml'
+      - 'maintenance/**'
+      - 'tools/upstream_watch.py'
+      - 'tests/test_upstream_watch.py'
+      - 'tests/firefox_ui.py'
+  pull_request:
+    paths:
+      - '.github/workflows/upstream-watch.yml'
+      - 'maintenance/**'
+      - 'tools/upstream_watch.py'
+      - 'tests/test_upstream_watch.py'
+      - 'tests/firefox_ui.py'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: firefox-upstream-${{ github.event_name }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  sources:
+    name: Sources and submission compatibility
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m unittest discover -s tests -p 'test_upstream_watch.py' -v
+      - name: Compare upstream sources and versions
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python tools/upstream_watch.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: upstream-source-report
+          path: artifacts/upstream-watch/
+          retention-days: 90
+          if-no-files-found: error
+
+  firefox:
+    name: Native / ${{ matrix.channel }} / ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - channel: Release
+            version: latest
+            os: ubuntu-latest
+          - channel: Release
+            version: latest
+            os: windows-latest
+          - channel: Beta
+            version: latest-beta
+            os: ubuntu-latest
+          - channel: Nightly
+            version: latest-nightly
+            os: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: browser-actions/setup-firefox@v1
+        id: firefox
+        with:
+          firefox-version: ${{ matrix.version }}
+      - name: Record installed version
+        shell: bash
+        env:
+          FIREFOX_VERSION: ${{ steps.firefox.outputs.firefox-version }}
+          FIREFOX_CHANNEL: ${{ matrix.channel }}
+        run: |
+          mkdir -p artifacts/firefox
+          printf '%s: %s\n' "$FIREFOX_CHANNEL" "$FIREFOX_VERSION" > artifacts/firefox/version.txt
+          cat artifacts/firefox/version.txt >> "$GITHUB_STEP_SUMMARY"
+      - name: Prepare isolated display
+        if: runner.os == 'Linux'
+        run: |
+          if ! command -v xvfb-run >/dev/null || ! command -v import >/dev/null; then
+            timeout 180s sudo apt-get -o Acquire::Retries=1 -o Acquire::http::Timeout=20 -o Acquire::https::Timeout=20 update
+            timeout 180s sudo apt-get -o Acquire::Retries=1 -o Acquire::http::Timeout=20 -o Acquire::https::Timeout=20 install -y xvfb imagemagick
+          fi
+      - name: Native Firefox theme checks (Linux display)
+        if: runner.os == 'Linux'
+        run: xvfb-run -a -s "-screen 0 1440x1000x24" python tests/firefox_ui.py --headed --firefox "${{ steps.firefox.outputs.firefox-path }}"
+      - name: Native Firefox theme checks (Windows headless)
+        if: runner.os == 'Windows'
+        run: python tests/firefox_ui.py --firefox "${{ steps.firefox.outputs.firefox-path }}"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: upstream-firefox-${{ matrix.channel }}-${{ matrix.os }}
+          path: artifacts/firefox/
+          retention-days: 90
+
+  report:
+    name: Update tracking issue
+    needs: [sources, firefox]
+    if: ${{ always() && !cancelled() && github.event_name != 'pull_request' && github.ref == 'refs/heads/main' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+      actions: read
+      issues: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        continue-on-error: true
+        with:
+          name: upstream-source-report
+          path: artifacts/upstream-watch/
+      - name: Publish latest report without adding comments
+        uses: actions/github-script@v7
+        env:
+          SOURCE_RESULT: ${{ needs.sources.result }}
+          FIREFOX_RESULT: ${{ needs.firefox.result }}
+        with:
+          script: |
+            const fs = require('node:fs');
+            const config = JSON.parse(fs.readFileSync('maintenance/upstream-watch.json', 'utf8'));
+            const run = `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
+            const jobs = await github.paginate(github.rest.actions.listJobsForWorkflowRun, {
+              ...context.repo, run_id: context.runId, per_page: 100
+            });
+            const native = jobs.filter(job => job.name.startsWith('Native / '));
+            const lines = ['<!-- firefox-upstream-watch -->',
+              'Latest check on main of Firefox sources and native theme rendering.', '',
+              `[Open run, logs and screenshots](${run})`, '',
+              '| Browser check | Result |', '| --- | --- |'];
+            for (const job of native) {
+              lines.push(`| [${job.name}](${job.html_url}) | ${job.conclusion || job.status} |`);
+            }
+            if (native.length !== 4) lines.push('| Expected browser jobs | Incomplete: inspect the run |');
+            const file = 'artifacts/upstream-watch/report.md';
+            lines.push('', fs.existsSync(file) ? fs.readFileSync(file, 'utf8') :
+              '**Source report unavailable. Upstream status is unknown; inspect the failed run.**');
+            lines.push('', 'Review the linked diffs and browser artifacts before changing colors or baselines. A browser failure may be a Firefox regression, an infrastructure problem, or a test fixture that needs updating.', '',
+              '[Maintenance guide](../blob/main/maintenance/README.md). This issue is updated in place; GitHub notification settings determine alerts.');
+            const body = lines.join('\n');
+            const issue = await github.rest.issues.get({...context.repo, issue_number: config.report_issue});
+            if (!issue.data.body.includes('<!-- firefox-upstream-watch -->')) {
+              throw new Error('Tracking issue marker missing; refusing to replace unrelated content');
+            }
+            if (issue.data.body !== body) {
+              await github.rest.issues.update({...context.repo, issue_number: config.report_issue, body});
+            }
+            await core.summary.addRaw(body).write();
+            if (process.env.SOURCE_RESULT !== 'success' || process.env.FIREFOX_RESULT !== 'success' || native.length !== 4) {
+              core.setFailed('Upstream checks need attention; see the tracking issue and job logs.');
+            }

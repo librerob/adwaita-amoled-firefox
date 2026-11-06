@@ -52,6 +52,17 @@ the browser's color-scheme preference; user overrides still apply.
 See [design notes](docs/design.md) for the mapping and
 [validation](docs/validation.md) for coverage and remaining checks.
 
+## Following Firefox updates
+
+[![Firefox upstream watch](https://github.com/librerob/adwaita-amoled-firefox/actions/workflows/upstream-watch.yml/badge.svg)](https://github.com/librerob/adwaita-amoled-firefox/actions/workflows/upstream-watch.yml)
+
+The [upstream watch](https://github.com/librerob/adwaita-amoled-firefox/issues/5)
+checks Firefox's theme API, native styles, Nova tokens, MDN documentation and
+submission compatibility every week. It also tests current Release, Beta and
+Nightly builds, with screenshots and color reports saved in GitHub Actions.
+Changes are flagged for review; colors and compatibility claims are never
+updated automatically. See the [maintenance guide](maintenance/README.md).
+
 ## Development
 
 Python 3.12 or later is enough for generation, palette checks and packaging:

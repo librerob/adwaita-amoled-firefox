@@ -6,6 +6,8 @@
 - Slightly deeper selection blue with more contrast for white labels.
 - Byte-exact manifest checks for UTF-8 and LF line endings.
 - Bounded retries and a distinct service-unavailable result for the AMO check.
+- Native checks for tab outlines, derived text and menu shortcuts.
+- A manual release workflow for checked main-branch revisions.
 
 ## 0.1.1
 

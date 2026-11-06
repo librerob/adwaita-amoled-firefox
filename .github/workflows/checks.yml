@@ -73,10 +73,6 @@ jobs:
       - name: Native Firefox theme checks (Windows headless)
         if: runner.os == 'Windows'
         run: python tests/firefox_ui.py --firefox "${{ steps.firefox.outputs.firefox-path }}"
-      - name: Export review evidence
-        if: always() && runner.os == 'Linux'
-        run: |
-          python -c "import base64,json; from pathlib import Path; names=['menu.png','selected-menu.png','selected-address-result.png','report.json','failure.png']; print('REVIEW_JSON='+json.dumps({name:base64.b64encode((Path('artifacts/firefox')/name).read_bytes()).decode() for name in names if (Path('artifacts/firefox')/name).exists()}))"
       - uses: actions/upload-artifact@v4
         if: always()
         with:

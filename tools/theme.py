@@ -69,6 +69,7 @@ def archive_bytes():
     with zipfile.ZipFile(output, "w", compression=zipfile.ZIP_DEFLATED, compresslevel=9) as archive:
         for filename, data in sorted(payloads.items()):
             entry = zipfile.ZipInfo(filename, (2026, 1, 1, 0, 0, 0))
+            entry.create_system = 3
             entry.compress_type = zipfile.ZIP_DEFLATED
             entry.external_attr = 0o100644 << 16
             archive.writestr(entry, data)

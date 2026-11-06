@@ -1,0 +1,56 @@
+name: Checks
+
+on:
+  push:
+    branches: [main, 'theme/**']
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  palette:
+    name: Palette and package
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python tools/theme.py --check
+      - run: python -m unittest discover -s tests -v
+      - run: python tools/theme.py --check --package
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Firefox manifest lint
+        run: npx --yes web-ext@8.9.0 lint --source-dir theme --warnings-as-errors
+      - uses: actions/upload-artifact@v4
+        with:
+          name: theme-package
+          path: dist/
+
+  firefox:
+    name: Firefox / ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: browser-actions/setup-firefox@v1
+        id: firefox
+        with:
+          firefox-version: '159.0.1'
+      - name: Native Firefox theme checks
+        run: python tests/firefox_ui.py --firefox "${{ steps.firefox.outputs.firefox-path }}"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: firefox-${{ matrix.os }}
+          path: artifacts/firefox/

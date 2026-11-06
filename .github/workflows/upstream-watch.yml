@@ -25,7 +25,7 @@ permissions:
 
 concurrency:
   group: firefox-upstream-${{ github.event_name }}-${{ github.ref }}
-  cancel-in-progress: false
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
   sources:
@@ -92,8 +92,8 @@ jobs:
         if: runner.os == 'Linux'
         run: |
           if ! command -v xvfb-run >/dev/null || ! command -v import >/dev/null; then
-            sudo apt-get update
-            sudo apt-get install -y xvfb imagemagick
+            timeout 180s sudo apt-get -o Acquire::Retries=1 -o Acquire::http::Timeout=20 -o Acquire::https::Timeout=20 update
+            timeout 180s sudo apt-get -o Acquire::Retries=1 -o Acquire::http::Timeout=20 -o Acquire::https::Timeout=20 install -y xvfb imagemagick
           fi
       - name: Native Firefox theme checks (Linux display)
         if: runner.os == 'Linux'
@@ -140,7 +140,7 @@ jobs:
             });
             const native = jobs.filter(job => job.name.startsWith('Native / '));
             const lines = ['<!-- firefox-upstream-watch -->',
-              'Latest scheduled or manual check of Firefox sources and native theme rendering.', '',
+              'Latest check on main of Firefox sources and native theme rendering.', '',
               `[Open run, logs and screenshots](${run})`, '',
               '| Browser check | Result |', '| --- | --- |'];
             for (const job of native) {

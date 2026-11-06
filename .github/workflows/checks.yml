@@ -60,7 +60,18 @@ jobs:
         id: firefox
         with:
           firefox-version: '159.0.1'
-      - name: Native Firefox theme checks
+      - name: Prepare isolated display
+        if: runner.os == 'Linux'
+        run: |
+          if ! command -v xvfb-run >/dev/null || ! command -v import >/dev/null; then
+            sudo apt-get update
+            sudo apt-get install -y xvfb imagemagick
+          fi
+      - name: Native Firefox theme checks (Linux display)
+        if: runner.os == 'Linux'
+        run: xvfb-run -a -s "-screen 0 1440x1000x24" python tests/firefox_ui.py --headed --firefox "${{ steps.firefox.outputs.firefox-path }}"
+      - name: Native Firefox theme checks (Windows headless)
+        if: runner.os == 'Windows'
         run: python tests/firefox_ui.py --firefox "${{ steps.firefox.outputs.firefox-path }}"
       - name: Export review evidence
         if: always() && runner.os == 'Linux'

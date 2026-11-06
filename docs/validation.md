@@ -14,6 +14,8 @@ contrast in every layout. It samples the computed address placeholder,
 selected history-result text, and hovered menu labels/shortcut hints, including
 opacity and their composed backgrounds. Menu hover is exercised with Firefox's
 pseudo-class test API; this checks native paint rather than pointer navigation.
+Linux also runs with an isolated Xvfb display and captures the actual popup
+widgets using ImageMagick. Document-only captures cannot show those widgets.
 
 ## Earlier validation records
 

@@ -8,6 +8,7 @@ import base64
 import json
 import os
 from pathlib import Path
+import shutil
 import socket
 import subprocess
 import sys
@@ -143,6 +144,11 @@ def measure_text(samples, state, report):
 
 
 def screenshot(client, target, height=None):
+    if getattr(client, "desktop_captures", False) and not target.name.startswith("preview-"):
+        # XUL popup widgets are absent from drawWindow's document-only capture.
+        client.js(WINDOW + "return new Promise(resolve=>win.requestAnimationFrame(()=>win.requestAnimationFrame(()=>resolve(true))));")
+        subprocess.run(["import", "-window", "root", str(target)], check=True, timeout=10)
+        return
     data = client.js(WINDOW + """
       const root=doc.documentElement;
       const restoreCue=arguments[1] && root.hasAttribute('remotecontrol');
@@ -163,7 +169,10 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--firefox", required=True)
     parser.add_argument("--output", default="artifacts/firefox")
+    parser.add_argument("--headed", action="store_true", help="Run with a display; Linux captures require ImageMagick's import command")
     args = parser.parse_args()
+    if args.headed and (not os.environ.get("DISPLAY") or not shutil.which("import")):
+        parser.error("--headed requires an isolated X11 display and ImageMagick import")
     output = Path(args.output).resolve()
     output.mkdir(parents=True, exist_ok=True)
     xpi = package()
@@ -192,10 +201,12 @@ def main():
         Path(temp, "user.js").write_text("".join(f"user_pref({json.dumps(k)}, {json.dumps(v)});\n" for k, v in prefs.items()))
         environment = dict(os.environ, MOZ_REMOTE_ALLOW_SYSTEM_ACCESS="1", MOZ_NO_REMOTE="1")
         log = open(output / "firefox.log", "w", encoding="utf-8")
-        process = subprocess.Popen([args.firefox, "--headless", "--marionette", "--no-remote", "--profile", temp, "--width", "1360", "--height", "900", "about:blank"], env=environment, stdout=log, stderr=subprocess.STDOUT)
+        command = [args.firefox] + ([] if args.headed else ["--headless"]) + ["--marionette", "--no-remote", "--profile", temp, "--width", "1360", "--height", "900", "about:blank"]
+        process = subprocess.Popen(command, env=environment, stdout=log, stderr=subprocess.STDOUT)
         client = None
         try:
             client = Marionette(port, process)
+            client.desktop_captures = args.headed
             report["session"] = client.session
             result = client.command("Addon:Install", {"path": str(xpi), "temporary": True})
             report["install"] = result

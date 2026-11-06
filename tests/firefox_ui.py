@@ -212,12 +212,19 @@ def main():
         finally:
             (output / "report.json").write_text(json.dumps(report, indent=2), encoding="utf-8")
             if client:
+                try:
+                    client.command("Marionette:Quit", {"flags": ["eForceQuit"]})
+                except (RuntimeError, EOFError, OSError):
+                    pass
                 client.socket.close()
-            process.terminate()
             try:
-                process.wait(timeout=10)
+                process.wait(timeout=20)
             except subprocess.TimeoutExpired:
-                process.kill()
+                # End only this fixture's process tree if graceful shutdown stalls.
+                if os.name == "nt":
+                    subprocess.run(["taskkill", "/PID", str(process.pid), "/T", "/F"], capture_output=True)
+                else:
+                    process.kill()
                 process.wait()
             log.close()
 
